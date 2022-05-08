@@ -16,7 +16,7 @@ base_url = 'https://business.egov.mv'
 
 def base_link(search_param):
     global start_time
-    start_time = datetime.now().strftime("%I:%M:%S")
+    start_time = datetime.now().strftime("%d-%m-%y %I:%M:%S")
     company_details = {}
     search_url = base_url+"/BusinessRegistry/SearchBusinessRegistry"
     data = {"query": search_param}
@@ -53,10 +53,13 @@ def main(company_name, each_code,  otp_dict):
         try:
             name_soup = csoup.find("div", {"class":'parallax-content-2'})
             otp_dict['OWCODE'].append(each_code)
-            otp_dict['FullName'].append(name_soup.find("div", {'class':'col-md-8'}).h1.text)
+            name_split = name_soup.find("div", {'class':'col-md-8'}).h1.text.split('|')
+            otp_dict['FullName'].append(name_split[0])
+            otp_dict['Register Number'].append(name_split[-1])
             otp_dict['URL'].append(company_url) 
         except:
             otp_dict['FullName'].append('')
+            otp_dict['Register Number'].append('')
             otp_dict['URL'].append('')
 
         try:
@@ -75,15 +78,20 @@ def main(company_name, each_code,  otp_dict):
                     otp_dict["StreetNumber"].append('')
                     break
                 try:    
-                    otp_dict["Street"].append(split_address[i+2])
-                except:
-                    otp_dict["Street"].append('')
-                    break
-                try:    
-                    otp_dict['TownName'].append(split_address[i+3])
+                    otp_dict["TownName"].append(split_address[i+2])
                 except:
                     otp_dict["TownName"].append('')
                     break
+                
+                if len(split_address)>4:
+                    try:    
+                        otp_dict['Street'].append(split_address[i+3].replace("'", ''))
+                    except:
+                        otp_dict["Street"].append('')
+                        break
+                else:
+                    otp_dict["Street"].append('')
+
                 try:    
                     otp_dict['CountryName'].append(split_address[-1])
                 except:
@@ -186,7 +194,7 @@ def main(company_name, each_code,  otp_dict):
                             except:
                                 otp_dict[f"BusinessExpiry Date.{n}"].append("")
             otp_dict["Start Time"].append(start_time)            
-            otp_dict["End Time"].append(datetime.now().strftime("%I:%M:%S"))                              
+            otp_dict["End Time"].append(datetime.now().strftime("%d-%m-%y %I:%M:%S"))                              
     else:
         otp_dict['OWCODE'].append(each_code)
         otp_dict['FullName'].append(company_name)
@@ -198,11 +206,11 @@ def main(company_name, each_code,  otp_dict):
 
 
 if __name__ == "__main__":
-    output = pd.read_excel("Output_format.xlsx")
+    output = pd.read_excel("./WebScraping/Requests/BusinessRegistry/Output_format.xlsx") 
     otp_cols = output.columns.tolist()
     otp_dict = dict.fromkeys(otp_cols,[])
     otp_dict = {k:[] for k in otp_cols}
-    input = pd.read_excel("Input.xlsx")
+    input = pd.read_excel("./WebScraping/Requests/BusinessRegistry/Input.xlsx")
     for each_comp, each_code in zip(input['FullName'], input['OWCODE']):
         otp_dict = main(each_comp, each_code, otp_dict)
-    pd.DataFrame(dict([(k,pd.Series(v)) for k,v in otp_dict.items()])).to_excel('final_output.xlsx', index=False)
+    pd.DataFrame(dict([(k,pd.Series(v)) for k,v in otp_dict.items()])).to_excel('./WebScraping/Requests/BusinessRegistry/final_output.xlsx', index=False)
