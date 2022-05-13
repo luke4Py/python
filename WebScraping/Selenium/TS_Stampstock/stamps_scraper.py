@@ -19,7 +19,7 @@ def entry():
     folder = "C:" + os.path.sep + "Users"+ os.path.sep + getpass.getuser() + os.path.sep + "Desktop"+ os.path.sep+ "Stamp_stocks" 
     pathlib.Path(folder).mkdir(parents=True, exist_ok=True)
     os.chdir(folder)
-    path = ("enter path to the chrome driver. (driver version should match your chrome version)") 
+    path = ("WebScraping\Selenium\chromedriver.exe") #Adjust you path and check webdriver compatibility with chrome browser
     url = 'https://registration.telangana.gov.in/stampStockPosition.htm'
     driver = Chrome(path) # , options = chrome_options)
     driver.get(url)

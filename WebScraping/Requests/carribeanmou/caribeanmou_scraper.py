@@ -6,6 +6,7 @@ import numpy as np
 
 #CURRENT DETENTIONS
 
+#print(Working on Current Detentions)
 cr_det_url = 'https://caribbeanmou.org/content/inspection-detention-data'
 try:
     cr_det_data = pd.read_html(cr_det_url)
@@ -16,9 +17,11 @@ if len(cr_det_data)>0:
     cr_final_data = cr_det_data[0]
 else:
     print("cr_det_data might be empty, confirm and check with UI")
+#print(Current Detentions Completed)
 
 
 #DETENTIONS
+#print(Working on Detentions)
 det_url = 'https://caribbeanmou.org/views/ajax'
 data_list = []
 page_num = 20
@@ -60,12 +63,14 @@ for each_inspec in final_det_data.loc[viewdef_idx, "Inspection ID"]:
 base_def_data = def_data_list[0].append(def_data_list[1:])
 dummy_data = pd.DataFrame(np.nan, columns =['Inspection ID',	'Deficiency Code',	'Deficiency Description',	'Action Taken'], index=range(len(final_det_data)))
 dummy_data.loc[pd.Index(viewdef_idx[0].tolist()),:] = base_def_data.set_index(pd.Index(viewdef_idx[0].tolist()))
-final_det_data.merge(dummy_data, on=dummy_data.index, how='left')
+# final_det_data.merge(dummy_data, on=dummy_data.index, how='left')
 final_detention_data = pd.concat([final_det_data, dummy_data], axis=1)
+#print(Detentions Completed)
 
 
 
 #INSPECTIONS
+#print(Working on Inspections)
 det_url = 'https://caribbeanmou.org/views/ajax'
 insp_data_list = []
 insp_page_num = 20
@@ -116,10 +121,11 @@ base_insp_data = insp_def_list[0].append(insp_def_list[1:])
 dummy_insp_data = pd.DataFrame(np.nan, columns =['Inspection ID',	'Deficiency Code',	'Deficiency Description',	'Action Taken'], index=range(len(final_insp_data)))
 dummy_insp_data.loc[pd.Index(list(viewinspdef_idx)),:] = base_insp_data.set_index(pd.Index(list(viewinspdef_idx)))
 final_insp_data = pd.concat([final_insp_data, dummy_insp_data], axis=1)
+print("Inspections Completed")
 
 # final_insp_data.to_excel("Inspections.xlsx")
 
-with pd.ExcelWriter('caribbeanmou.xlsx',mode='ab') as writer: 
+with pd.ExcelWriter('caribbeanmou.xlsx',mode='ab') as writer:  #Keep the path where you want to store the xlsx.
     cr_final_data.to_excel(writer, sheet_name='current dententions') 
     final_detention_data.to_excel(writer,sheet_name='Detentions')
     final_insp_data.to_excel(writer,sheet_name='Inspections')
