@@ -206,7 +206,7 @@ def main(company_name, each_code,  otp_dict):
 
 
 if __name__ == "__main__":
-    output = pd.read_excel("./WebScraping/Requests/BusinessRegistry/Output_format.xlsx") 
+    output = pd.read_excel("./WebScraping/Requests/BusinessRegistry/Op.xlsx") 
     otp_cols = output.columns.tolist()
     otp_dict = dict.fromkeys(otp_cols,[])
     otp_dict = {k:[] for k in otp_cols}
